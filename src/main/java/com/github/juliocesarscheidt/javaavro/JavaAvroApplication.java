@@ -49,7 +49,7 @@ public class JavaAvroApplication {
 	}
 
 	public static void sendMessage(String topic, Customer customer) {
-		KafkaProducer<String, Customer> producer = createProducer();
+    KafkaProducer<String, Customer> producer = createProducer();
 
     // send a message to topic, asynchronously
     ProducerRecord<String, Customer> record = new ProducerRecord<String, Customer>(topic, customer);
@@ -73,21 +73,21 @@ public class JavaAvroApplication {
 	}
 
 	public static void main(String[] args) {
-		System.out.println("Starting");
+    System.out.println("Starting");
 
-		String topic = System.getenv("TOPIC_NAME") != null ?
-			System.getenv("TOPIC_NAME") : "customer-avro";
+    String topic = System.getenv("TOPIC_NAME") != null ?
+    System.getenv("TOPIC_NAME") : "customer-avro";
 
-		Customer customer = Customer.newBuilder()
-			.setFirstName("Julio")
-			.setLastName("Cesar")
-			.setAge(25)
-			.setHeight(180.0f)
-			.setWeight(80.0f)
-			.setAutomatedEmail(false)
-			.build();
+    Customer customer = Customer.newBuilder()
+      .setFirstName("Julio")
+      .setLastName("Cesar")
+      .setAge(25)
+      .setHeight(180.0f)
+      .setWeight(80.0f)
+      .setAutomatedEmail(false)
+      .build();
 
-		sendMessage(topic, customer);
-		System.out.println("Message sent");
+    sendMessage(topic, customer);
+    System.out.println("Message sent");
 	}
 }
