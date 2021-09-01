@@ -1,0 +1,24 @@
+
+<settings>
+  <mirrors>
+    <mirror>
+      <id>maven-default-http-blocker</id>
+      <mirrorOf>external:http:*</mirrorOf>
+      <name>Pseudo repository to mirror external repositories initially using HTTP.</name>
+      <url>http://0.0.0.0/</url>
+      <blocked>true</blocked>
+    </mirror>
+
+    <!-- <mirror>
+      <id>nexus-public-snapshots</id>
+      <mirrorOf>public-snapshots</mirrorOf>
+      <url>http://nexus:8081/nexus/content/groups/public-snapshots</url>
+    </mirror>
+
+    <mirror>
+      <id>nexus-public-releases</id>
+      <mirrorOf>*,!confluent</mirrorOf>
+      <url>http://nexus:8081/nexus/content/groups/public</url>
+    </mirror> -->
+  </mirrors>
+</settings>

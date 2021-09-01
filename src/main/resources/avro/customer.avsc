@@ -1,0 +1,14 @@
+{
+	"type": "record",
+	"namespace": "com.github.juliocesarscheidt.javaavro",
+	"name": "Customer",
+	"version": "1",
+	"fields": [
+		{ "name": "first_name", "type": "string", "doc": "First name of customer" },
+		{ "name": "last_name", "type": "string", "doc": "Last name of customer" },
+		{ "name": "age", "type": "int", "doc": "Age at registration" },
+		{ "name": "height", "type": "float", "doc": "Height at registration in cm" },
+		{ "name": "weight", "type": "float", "doc": "Weight at registration in kg" },
+		{ "name": "automated_email", "type": "boolean", "default": true, "doc": "Field indicating whether the user enrolled in marketing emails" }
+	]
+}
