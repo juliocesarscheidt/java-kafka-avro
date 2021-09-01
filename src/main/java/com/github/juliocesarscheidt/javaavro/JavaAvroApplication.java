@@ -13,7 +13,7 @@ import io.confluent.kafka.serializers.KafkaAvroSerializer;
 
 public class JavaAvroApplication {
 
-	public static KafkaProducer<String, Customer> createProducer() {
+  public static KafkaProducer<String, Customer> createProducer() {
     Properties config = new Properties();
 
     String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS") != null ?
@@ -46,9 +46,9 @@ public class JavaAvroApplication {
     config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 5 + (30 * 1000)); // 30005 ms
 
     return new KafkaProducer<String, Customer>(config);
-	}
+  }
 
-	public static void sendMessage(String topic, Customer customer) {
+  public static void sendMessage(String topic, Customer customer) {
     KafkaProducer<String, Customer> producer = createProducer();
 
     // send a message to topic, asynchronously
@@ -70,9 +70,9 @@ public class JavaAvroApplication {
 
     producer.flush();
     producer.close();
-	}
+  }
 
-	public static void main(String[] args) {
+  public static void main(String[] args) {
     System.out.println("Starting");
 
     String topic = System.getenv("TOPIC_NAME") != null ?
@@ -89,5 +89,5 @@ public class JavaAvroApplication {
 
     sendMessage(topic, customer);
     System.out.println("Message sent");
-	}
+  }
 }
