@@ -56,9 +56,9 @@ services:
   producer-avro:
     container_name: producer-avro
     hostname: producer-avro
-    image: juliocesarmidia/producer-avro:6.0.0
+    image: juliocesarmidia/producer-avro:latest
     build:
-      context: .
+      context: ./producer-avro
     restart: "no"
     networks:
       - subnet_0
@@ -68,17 +68,32 @@ services:
       SCHEMA_REGISTRY_URL: http://schema-registry:8081
       TOPIC_NAME: customer-avro
 
-  nexus:
-    container_name: nexus
-    hostname: nexus
-    image: sonatype/nexus3
-    restart: on-failure
+  consumer-avro:
+    container_name: consumer-avro
+    hostname: consumer-avro
+    image: juliocesarmidia/consumer-avro:latest
+    build:
+      context: ./consumer-avro
+    restart: "no"
     networks:
       - subnet_0
-    ports:
-      - 9081:8081
-    volumes:
-      - nexus-data:/nexus-data
+    environment:
+      JAVA_OPTIONS: -Xmx400m
+      BOOTSTRAP_SERVERS: kafka:9092
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      TOPIC_NAME: customer-avro
+
+  # nexus:
+  #   container_name: nexus
+  #   hostname: nexus
+  #   image: sonatype/nexus3
+  #   restart: on-failure
+  #   networks:
+  #     - subnet_0
+  #   ports:
+  #     - 9081:8081
+  #   volumes:
+  #     - nexus-data:/nexus-data
 
 networks:
   subnet_0:

@@ -3,7 +3,7 @@
   "namespace": "com.github.juliocesarscheidt.javaavro",
   "name": "Customer",
   "version": "1",
-  "fields": [  ''
+  "fields": [
     { "name": "first_name", "type": "string", "doc": "First name of customer" },
     { "name": "last_name", "type": "string", "doc": "Last name of customer" },
     { "name": "age", "type": "int", "doc": "Age at registration" },

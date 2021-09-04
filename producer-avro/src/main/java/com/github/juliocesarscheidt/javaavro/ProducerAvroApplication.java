@@ -11,15 +11,10 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 
-public class JavaAvroApplication {
+public class ProducerAvroApplication {
 
-  public static KafkaProducer<String, Customer> createProducer() {
+  public static KafkaProducer<String, Customer> createProducer(String bootstrapServers, String schemaRegistry) {
     Properties config = new Properties();
-
-    String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS") != null ?
-      System.getenv("BOOTSTRAP_SERVERS") : "127.0.0.1:9092";
-    String schemaRegistry = System.getenv("SCHEMA_REGISTRY_URL") != null ?
-      System.getenv("SCHEMA_REGISTRY_URL") : "http://127.0.0.1:8081";
 
     config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
     config.put("schema.registry.url", schemaRegistry);
@@ -33,7 +28,6 @@ public class JavaAvroApplication {
     config.put(ProducerConfig.ACKS_CONFIG, "all");
     config.put(ProducerConfig.RETRIES_CONFIG, Integer.toString(Integer.MAX_VALUE));
     config.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 100);
-    config.put("delivery.timeout.ms", 30 * 1000); // 30 secs
     config.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 5);
     config.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432); // 32 MB
     config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 33554432); // 32 MB
@@ -43,14 +37,12 @@ public class JavaAvroApplication {
     config.put(ProducerConfig.LINGER_MS_CONFIG, 5); // 5 ms
     config.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 30 * 1000); // 30 * 1000 ms
     // delivery.timeout.ms should be equal to or larger than linger.ms + request.timeout.ms
-    config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 5 + (30 * 1000)); // 30005 ms
+    config.put("delivery.timeout.ms", 5 + (30 * 1000)); // 30005 ms
 
     return new KafkaProducer<String, Customer>(config);
   }
 
-  public static void sendMessage(String topic, Customer customer) {
-    KafkaProducer<String, Customer> producer = createProducer();
-
+  public static void sendMessage(KafkaProducer<String, Customer> producer, String topic, Customer customer) {
     // send a message to topic, asynchronously
     ProducerRecord<String, Customer> record = new ProducerRecord<String, Customer>(topic, customer);
 
@@ -67,27 +59,40 @@ public class JavaAvroApplication {
         }
       }
     });
-
-    producer.flush();
-    producer.close();
   }
 
   public static void main(String[] args) {
-    System.out.println("Starting");
+    System.out.println("Starting Avro Producer");
+
+    String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS") != null ?
+      System.getenv("BOOTSTRAP_SERVERS") : "kafka:9092";
+
+    String schemaRegistry = System.getenv("SCHEMA_REGISTRY_URL") != null ?
+      System.getenv("SCHEMA_REGISTRY_URL") : "http://schema-registry:8081";
 
     String topic = System.getenv("TOPIC_NAME") != null ?
-    System.getenv("TOPIC_NAME") : "customer-avro";
+      System.getenv("TOPIC_NAME") : "customer-avro";
 
-    Customer customer = Customer.newBuilder()
-      .setFirstName("Julio")
-      .setLastName("Cesar")
-      .setAge(25)
-      .setHeight(180.0f)
-      .setWeight(80.0f)
-      .setAutomatedEmail(false)
-      .build();
+    KafkaProducer<String, Customer> producer = createProducer(bootstrapServers, schemaRegistry);
 
-    sendMessage(topic, customer);
-    System.out.println("Message sent");
+    for (int i = 0; i <= 10; i ++) {
+      Customer customer = Customer.newBuilder()
+        .setFirstName("Julio " + String.valueOf(i))
+        .setLastName("Cesar " + String.valueOf(i))
+        .setAge(20 + i)
+        .setHeight(180.0f)
+        .setWeight(80.0f)
+        .setAutomatedEmail(i % 2 == 0 ? false : true)
+        .build();
+
+      sendMessage(producer, topic, customer);
+      System.out.println("Message sent " + customer.toString());
+    }
+
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      System.out.println("Flushing and Closing Producer");
+      producer.flush();
+      producer.close();
+    }));
   }
 }
